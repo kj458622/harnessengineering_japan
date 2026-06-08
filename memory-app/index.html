@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>소리장면 일본어</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">音</div>
+          <div>
+            <h1>소리장면 일본어</h1>
+            <p>발음 하나, 뜻 하나, 장면 하나</p>
+          </div>
+        </div>
+
+        <nav class="nav-tabs" aria-label="주요 화면">
+          <button class="nav-tab active" data-view="study" type="button">학습</button>
+          <button class="nav-tab" data-view="library" type="button">단어장</button>
+          <button class="nav-tab" data-view="review" type="button">복습</button>
+          <button class="nav-tab" data-view="quiz" type="button">퀴즈</button>
+        </nav>
+
+        <section class="stats-panel" aria-label="학습 통계">
+          <div>
+            <span id="savedCount">0</span>
+            <small>저장 단어</small>
+          </div>
+          <div>
+            <span id="dueCount">0</span>
+            <small>오늘 복습</small>
+          </div>
+          <div>
+            <span id="knownCount">0</span>
+            <small>기억남</small>
+          </div>
+        </section>
+
+        <section class="sample-panel">
+          <h2>빠른 예시</h2>
+          <div id="sampleButtons" class="sample-buttons"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <section class="view active" id="studyView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">AI 없이도 돌아가는 MVP</p>
+              <h2>일본어 단어를 경선식 스타일 카드로 만들기</h2>
+            </div>
+            <button id="resetDemoBtn" class="ghost-button" type="button">샘플 초기화</button>
+          </div>
+
+          <form id="wordForm" class="word-form">
+            <label for="wordInput">단어, 읽기, 뜻 중 아무거나 입력</label>
+            <div class="input-row">
+              <input id="wordInput" autocomplete="off" placeholder="예: 森, 모리, 地図, 지다이, 暑い" />
+              <button type="submit">카드 생성</button>
+            </div>
+          </form>
+
+          <div class="study-grid">
+            <article id="cardPreview" class="word-card large-card"></article>
+
+            <aside class="editor-panel">
+              <h3>내 암기문으로 다듬기</h3>
+              <label for="mnemonicEdit">경선식 암기문</label>
+              <textarea id="mnemonicEdit" rows="4"></textarea>
+              <label for="noteEdit">내 메모</label>
+              <textarea id="noteEdit" rows="4" placeholder="예: 시험 전에 헷갈린 부분, 내가 만든 말장난"></textarea>
+              <div class="button-row">
+                <button id="saveCardBtn" type="button">저장</button>
+                <button id="copyMnemonicBtn" class="secondary-button" type="button">암기문 복사</button>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="libraryView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">내 단어장</p>
+              <h2>저장한 카드 관리</h2>
+            </div>
+            <div class="filter-group" role="group" aria-label="단어 필터">
+              <button class="filter-button active" data-filter="all" type="button">전체</button>
+              <button class="filter-button" data-filter="due" type="button">오늘 복습</button>
+              <button class="filter-button" data-filter="weak" type="button">헷갈림</button>
+            </div>
+          </div>
+          <div id="libraryList" class="card-list"></div>
+        </section>
+
+        <section class="view" id="reviewView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">간격 반복</p>
+              <h2>카드를 뒤집고 기억 상태를 기록하기</h2>
+            </div>
+          </div>
+          <div class="review-layout">
+            <article id="reviewCard" class="review-card" role="button" tabindex="0" aria-label="복습 카드 뒤집기"></article>
+            <div class="review-actions">
+              <button id="flipReviewBtn" class="secondary-button" type="button">뒤집기</button>
+              <button id="rememberBtn" type="button">기억남</button>
+              <button id="confusedBtn" class="danger-button" type="button">헷갈림</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="quizView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">퀴즈</p>
+              <h2>암기문으로 뜻 떠올리기</h2>
+            </div>
+            <button id="nextQuizBtn" class="secondary-button" type="button">다음 문제</button>
+          </div>
+          <article id="quizCard" class="quiz-card"></article>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
