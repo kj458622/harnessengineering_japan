@@ -18,7 +18,9 @@
         </div>
 
         <nav class="nav-tabs" aria-label="주요 화면">
-          <button class="nav-tab active" data-view="study" type="button">학습</button>
+          <button class="nav-tab active" data-view="study" type="button">단어학습</button>
+          <button class="nav-tab" data-view="kanji" type="button">한자학습</button>
+          <button class="nav-tab" data-view="search" type="button">검색</button>
           <button class="nav-tab" data-view="library" type="button">단어장</button>
           <button class="nav-tab" data-view="review" type="button">복습</button>
           <button class="nav-tab" data-view="quiz" type="button">퀴즈</button>
@@ -49,19 +51,23 @@
         <section class="view active" id="studyView">
           <div class="topbar">
             <div>
-              <p class="eyebrow">AI 없이도 돌아가는 MVP</p>
-              <h2>일본어 단어를 경선식 스타일 카드로 만들기</h2>
+              <p class="eyebrow">JLPT 단어학습</p>
+              <h2>N5, N4, N3 챕터별 단어를 고르고 카드로 외우기</h2>
             </div>
             <button id="resetDemoBtn" class="ghost-button" type="button">샘플 초기화</button>
           </div>
 
-          <form id="wordForm" class="word-form">
-            <label for="wordInput">단어, 읽기, 뜻 중 아무거나 입력</label>
-            <div class="input-row">
-              <input id="wordInput" autocomplete="off" placeholder="예: 森, 모리, 地図, 지다이, 暑い" />
-              <button type="submit">카드 생성</button>
+          <div class="learning-tools">
+            <div class="level-filter" id="wordLevelFilter" role="group" aria-label="단어 레벨 필터">
+              <button class="filter-button active" data-level="all" type="button">전체</button>
+              <button class="filter-button" data-level="N5" type="button">N5</button>
+              <button class="filter-button" data-level="N4" type="button">N4</button>
+              <button class="filter-button" data-level="N3" type="button">N3</button>
             </div>
-          </form>
+            <input id="wordStudySearch" class="inline-search" autocomplete="off" placeholder="단어학습에서 검색" />
+          </div>
+          <div id="wordSummary" class="db-summary">DB 로딩 중</div>
+          <div id="wordLevelSections" class="db-level-sections learning-sections"></div>
 
           <div class="study-grid">
             <article id="cardPreview" class="word-card large-card"></article>
@@ -77,6 +83,46 @@
                 <button id="copyMnemonicBtn" class="secondary-button" type="button">암기문 복사</button>
               </div>
             </aside>
+          </div>
+        </section>
+
+        <section class="view" id="kanjiView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">JLPT 한자학습</p>
+              <h2>N5, N4, N3 단어에서 나온 한자를 따로 보기</h2>
+            </div>
+            <div id="kanjiSummary" class="db-summary">한자 DB 로딩 중</div>
+          </div>
+          <div class="learning-tools">
+            <div class="level-filter" id="kanjiLevelFilter" role="group" aria-label="한자 레벨 필터">
+              <button class="filter-button active" data-level="all" type="button">전체</button>
+              <button class="filter-button" data-level="N5" type="button">N5</button>
+              <button class="filter-button" data-level="N4" type="button">N4</button>
+              <button class="filter-button" data-level="N3" type="button">N3</button>
+            </div>
+            <input id="kanjiStudySearch" class="inline-search" autocomplete="off" placeholder="한자학습에서 검색" />
+          </div>
+          <div id="kanjiLevelSections" class="db-level-sections"></div>
+        </section>
+
+        <section class="view" id="searchView">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">사전 검색</p>
+              <h2>모르는 단어, 읽기, 뜻, 한자를 빠르게 찾기</h2>
+            </div>
+          </div>
+
+          <form id="wordForm" class="word-form search-form">
+            <label for="wordInput">단어, 읽기, 뜻 중 아무거나 입력</label>
+            <div class="input-row">
+              <input id="wordInput" autocomplete="off" placeholder="예: 森, 모리, 地図, 지다이, 暑い" />
+              <button type="submit">검색</button>
+            </div>
+          </form>
+          <div id="searchResult" class="search-result">
+            <div class="empty-state">검색하면 이 화면 안에 결과 카드가 표시됩니다.</div>
           </div>
         </section>
 

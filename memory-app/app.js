@@ -1,4 +1,5 @@
 const STORAGE_KEY = "japanese-memory-app-cards";
+const STATIC_DB_URL = "./data/jlpt-all-cards-index.json";
 
 const seedCards = [
   {
@@ -130,14 +131,23 @@ const seedCards = [
 ];
 
 let cards = loadCards();
+let staticCards = [...seedCards];
+let staticDbLoaded = false;
 let currentCard = cards[0] || { ...seedCards[0] };
 let currentFilter = "all";
+let wordStudyLevel = "all";
+let kanjiStudyLevel = "all";
+let wordStudyQuery = "";
+let kanjiStudyQuery = "";
+let searchResultCard = null;
 let reviewIndex = 0;
 let reviewBack = false;
 let quizAnswer = null;
 
 const views = {
   study: document.querySelector("#studyView"),
+  kanji: document.querySelector("#kanjiView"),
+  search: document.querySelector("#searchView"),
   library: document.querySelector("#libraryView"),
   review: document.querySelector("#reviewView"),
   quiz: document.querySelector("#quizView"),
@@ -147,6 +157,15 @@ const cardPreview = document.querySelector("#cardPreview");
 const mnemonicEdit = document.querySelector("#mnemonicEdit");
 const noteEdit = document.querySelector("#noteEdit");
 const libraryList = document.querySelector("#libraryList");
+const wordLevelSections = document.querySelector("#wordLevelSections");
+const wordSummary = document.querySelector("#wordSummary");
+const wordLevelFilter = document.querySelector("#wordLevelFilter");
+const wordStudySearch = document.querySelector("#wordStudySearch");
+const kanjiLevelSections = document.querySelector("#kanjiLevelSections");
+const kanjiSummary = document.querySelector("#kanjiSummary");
+const kanjiLevelFilter = document.querySelector("#kanjiLevelFilter");
+const kanjiStudySearch = document.querySelector("#kanjiStudySearch");
+const searchResult = document.querySelector("#searchResult");
 const reviewCard = document.querySelector("#reviewCard");
 const quizCard = document.querySelector("#quizCard");
 
@@ -200,15 +219,78 @@ function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function searchTerms(query) {
+  const term = normalize(query);
+  if (!term) return [];
+  const terms = [term];
+  if (term.endsWith("하다") && term.length > 2) terms.push(term.slice(0, -2));
+  return terms;
+}
+
 function findCard(query) {
   const term = normalize(query);
-  return (
-    seedCards.find((card) => {
-      return [card.expression, card.reading, card.romaji, card.meaningKo, card.soundKo]
-        .map(normalize)
-        .some((value) => value.includes(term) || term.includes(value));
-    }) || null
-  );
+  const terms = searchTerms(query);
+  const searchableCards = [...cards, ...staticCards];
+  const exactMatch = searchableCards.find((card) => {
+    return [card.expression, card.reading, card.romaji, card.meaningKo, card.soundKo]
+      .map(normalize)
+      .some((value) => value === term);
+  });
+
+  if (exactMatch) return exactMatch;
+
+  return searchableCards.find((card) => {
+    return [card.expression, card.reading, card.romaji, card.meaningKo, card.soundKo]
+      .map(normalize)
+      .some((value) => searchValueMatches(terms, value));
+  }) || null;
+}
+
+function searchValueMatches(terms, value) {
+  if (!value) return false;
+  return terms.some((term) => term && value.includes(term));
+}
+
+function cardMatches(card, query) {
+  const terms = searchTerms(query);
+  if (!terms.length) return true;
+  return [card.expression, card.reading, card.romaji, card.meaningKo, card.soundKo, card.partOfSpeech]
+    .map(normalize)
+    .some((value) => searchValueMatches(terms, value));
+}
+
+function kanjiEntryMatches(entry, query) {
+  const terms = searchTerms(query);
+  if (!terms.length) return true;
+  const baseFields = [entry.kanji, entry.koreanSound, entry.meaning, entry.easyStory].map(normalize);
+  const wordFields = entry.words.flatMap((word) => [word.expression, word.reading, word.romaji, word.meaningKo]).map(normalize);
+  return [...baseFields, ...wordFields].some((value) => searchValueMatches(terms, value));
+}
+
+async function loadStaticDb() {
+  try {
+    const response = await fetch(STATIC_DB_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const dbCards = await response.json();
+    const byId = new Map();
+
+    [...seedCards, ...dbCards].forEach((card) => {
+      byId.set(card.id, withReviewDefaults(card));
+    });
+
+    staticCards = Array.from(byId.values());
+    staticDbLoaded = true;
+    renderSamples();
+    renderWordStudy();
+    renderKanjiStudy();
+    showToast(`검색 DB ${staticCards.length}개를 불러왔습니다.`);
+  } catch (error) {
+    staticDbLoaded = false;
+    console.warn("검색 DB를 불러오지 못했습니다.", error);
+    renderWordStudy();
+    renderKanjiStudy();
+    showToast("검색 DB를 불러오지 못해 샘플만 사용합니다.");
+  }
 }
 
 function createFallbackCard(query) {
@@ -233,6 +315,41 @@ function createFallbackCard(query) {
   });
 }
 
+function extractKanjiChars(value) {
+  return Array.from(new Set(String(value || "").match(/[\u3400-\u9fff]/g) || []));
+}
+
+function getDisplayKanjiNotes(card) {
+  if (card.kanjiNotes && card.kanjiNotes.length) return card.kanjiNotes;
+  return extractKanjiChars(card.expression).map((kanji) => ({
+    kanji,
+    koreanSound: "분석 대기",
+    meaning: "API 분석 필요",
+    easyStory: `${kanji}가 들어간 한자 단어입니다. API로 정밀 분석을 누르면 뜻, 구성요소, 암기 스토리를 채울 수 있습니다.`
+  }));
+}
+
+function renderKanjiNotesHtml(card) {
+  const notes = getDisplayKanjiNotes(card);
+  if (!notes.length) {
+    return `<p class="muted">한자 없는 단어입니다. 소리와 사용 장면 중심으로 외우세요.</p>`;
+  }
+
+  return `<div class="kanji-list">${notes
+    .map(
+      (note) => `
+        <div class="kanji-item">
+          <div class="kanji-char">${escapeHtml(note.kanji)}</div>
+          <div>
+            <strong>${escapeHtml(note.koreanSound)} · ${escapeHtml(note.meaning)}</strong>
+            <p>${escapeHtml(note.easyStory)}</p>
+          </div>
+        </div>
+      `,
+    )
+    .join("")}</div>`;
+}
+
 function selectCard(card) {
   currentCard = withReviewDefaults({ ...card });
   mnemonicEdit.value = currentCard.mnemonic;
@@ -242,22 +359,7 @@ function selectCard(card) {
 
 function renderCardPreview() {
   if (!currentCard) return;
-
-  const kanjiHtml = currentCard.kanjiNotes && currentCard.kanjiNotes.length
-    ? `<div class="kanji-list">${currentCard.kanjiNotes
-        .map(
-          (note) => `
-            <div class="kanji-item">
-              <div class="kanji-char">${escapeHtml(note.kanji)}</div>
-              <div>
-                <strong>${escapeHtml(note.koreanSound)} · ${escapeHtml(note.meaning)}</strong>
-                <p>${escapeHtml(note.easyStory)}</p>
-              </div>
-            </div>
-          `,
-        )
-        .join("")}</div>`
-    : `<p class="muted">한자 없는 단어입니다. 소리와 사용 장면 중심으로 외우세요.</p>`;
+  const kanjiHtml = renderKanjiNotesHtml(currentCard);
 
   cardPreview.innerHTML = `
     <div class="card-header">
@@ -293,6 +395,62 @@ function renderCardPreview() {
   `;
 }
 
+function renderCardHtml(card) {
+  const kanjiHtml = renderKanjiNotesHtml(card);
+
+  return `
+    <article class="word-card large-card">
+      <div class="card-header">
+        <div>
+          <h3 class="expression">${escapeHtml(card.expression)}</h3>
+          <p class="reading">${escapeHtml(card.reading)} ${card.romaji ? `· ${escapeHtml(card.romaji)}` : ""}</p>
+        </div>
+        <div class="meaning-badge">${escapeHtml(card.meaningKo)}</div>
+      </div>
+      <section class="card-section">
+        <h3>쉽게 말하면</h3>
+        <p>${escapeHtml(card.easyExplanation)}</p>
+      </section>
+      <section class="card-section">
+        <h3>경선식 암기</h3>
+        <div class="mnemonic">${escapeHtml(card.mnemonic)}</div>
+      </section>
+      <section class="card-section">
+        <h3>소리 핵심</h3>
+        <p><strong>${escapeHtml(card.soundKo || card.reading)}</strong></p>
+        <p>${escapeHtml(card.pronunciationNote || "전체 발음과 뜻을 한 장면으로 묶어 기억하세요.")}</p>
+      </section>
+      <section class="card-section">
+        <h3>한자 보강</h3>
+        ${kanjiHtml}
+      </section>
+      <section class="card-section">
+        <h3>예문</h3>
+        <p><strong>${escapeHtml(card.exampleJa)}</strong></p>
+        ${card.exampleReading ? `<p class="muted">${escapeHtml(card.exampleReading)}</p>` : ""}
+        <p>${escapeHtml(card.exampleKo)}</p>
+      </section>
+      <div class="button-row search-result-actions">
+        <button type="button" data-search-save="${escapeHtml(card.id)}">단어장 저장</button>
+        <button class="secondary-button" type="button" data-search-study="${escapeHtml(card.id)}">단어학습에서 열기</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderSearchResult(card, message) {
+  if (!searchResult) return;
+  if (!card) {
+    searchResult.innerHTML = `<div class="empty-state">${escapeHtml(message || "검색하면 이 화면 안에 결과 카드가 표시됩니다.")}</div>`;
+    return;
+  }
+  searchResultCard = withReviewDefaults(card);
+  searchResult.innerHTML = `
+    <p class="status mock">${escapeHtml(message || "검색 결과입니다.")}</p>
+    ${renderCardHtml(searchResultCard)}
+  `;
+}
+
 function saveCurrentCard() {
   const edited = withReviewDefaults({
     ...currentCard,
@@ -314,6 +472,15 @@ function saveCurrentCard() {
   showToast("단어장에 저장했습니다.");
 }
 
+function saveCardToLibrary(card) {
+  const saved = withReviewDefaults({ ...card, updatedAt: new Date().toISOString() });
+  const exists = cards.some((item) => item.id === saved.id);
+  cards = exists ? cards.map((item) => (item.id === saved.id ? { ...saved, review: item.review } : item)) : [saved, ...cards];
+  persistCards();
+  renderAll();
+  return exists;
+}
+
 function renderStats() {
   const dueCards = getDueCards();
   document.querySelector("#savedCount").textContent = cards.length;
@@ -326,6 +493,9 @@ function renderSamples() {
   sampleButtons.innerHTML = seedCards
     .map((card) => `<button type="button" data-sample="${card.id}">${escapeHtml(card.expression)}</button>`)
     .join("");
+  if (staticDbLoaded) {
+    sampleButtons.insertAdjacentHTML("beforeend", `<span class="db-count">DB ${staticCards.length}개</span>`);
+  }
 }
 
 function renderLibrary() {
@@ -355,6 +525,137 @@ function renderLibrary() {
             <button class="danger-button" type="button" data-delete="${card.id}">삭제</button>
           </div>
         </article>
+      `,
+    )
+    .join("");
+}
+
+function renderWordStudy() {
+  if (!wordLevelSections || !wordSummary) return;
+
+  const levels = ["N5", "N4", "N3"];
+  const visibleLevels = wordStudyLevel === "all" ? levels : levels.filter((level) => level === wordStudyLevel);
+  const byLevel = visibleLevels.map((level) => ({
+    level,
+    cards: staticCards.filter((card) => card.jlptLevel === level && cardMatches(card, wordStudyQuery))
+  }));
+  const total = byLevel.reduce((sum, group) => sum + group.cards.length, 0);
+
+  wordSummary.textContent = staticDbLoaded ? `표시 ${total}개 단어` : "샘플 단어만 표시 중";
+
+  const firstMatchGroup = byLevel.find((group) => group.cards.length);
+  const firstMatch = firstMatchGroup ? firstMatchGroup.cards[0] : null;
+  if (wordStudyQuery.trim() && firstMatch && currentCard.id !== firstMatch.id) {
+    selectCard(firstMatch);
+  }
+
+  wordLevelSections.innerHTML = byLevel
+    .map(
+      ({ level, cards: levelCards }) => `
+        <section class="db-level-section" aria-label="${level} 단어">
+          <div class="db-level-header">
+            <div>
+              <p class="eyebrow">${level}</p>
+              <h3>${level} 챕터</h3>
+            </div>
+            <span>${levelCards.length}개</span>
+          </div>
+          <div class="db-word-grid">
+            ${levelCards
+              .map(
+                (card) => `
+                  <article class="db-word-item">
+                    <button class="db-word-main" type="button" data-word-open="${escapeHtml(card.id)}">
+                      <strong>${escapeHtml(card.expression)}</strong>
+                      <span>${escapeHtml(card.reading)}${card.romaji ? ` · ${escapeHtml(card.romaji)}` : ""}</span>
+                      <small>${escapeHtml(card.meaningKo)}</small>
+                    </button>
+                    <button class="secondary-button db-save-button" type="button" data-word-save="${escapeHtml(card.id)}">저장</button>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+        </section>
+      `,
+    )
+    .join("");
+}
+
+function buildKanjiGroups() {
+  const levels = ["N5", "N4", "N3"];
+  const visibleLevels = kanjiStudyLevel === "all" ? levels : levels.filter((level) => level === kanjiStudyLevel);
+  return visibleLevels.map((level) => {
+    const entries = new Map();
+    staticCards
+      .filter((card) => card.jlptLevel === level)
+      .forEach((card) => {
+        const notes = new Map((card.kanjiNotes || []).map((note) => [note.kanji, note]));
+        const chars = Array.from(new Set(String(card.expression || "").match(/[\u3400-\u9fff]/g) || []));
+        chars.forEach((kanji) => {
+          const note = notes.get(kanji) || {};
+          if (!entries.has(kanji)) {
+            entries.set(kanji, {
+              kanji,
+              koreanSound: note.koreanSound || "확인 필요",
+              meaning: note.meaning || "단어에서 확인",
+              easyStory: note.easyStory || `${kanji}가 들어간 단어들을 먼저 묶어서 외우세요.`,
+              words: []
+            });
+          }
+          const entry = entries.get(kanji);
+          if (entry.words.length < 5) entry.words.push(card);
+        });
+      });
+    return { level, kanji: Array.from(entries.values()).filter((entry) => kanjiEntryMatches(entry, kanjiStudyQuery)) };
+  });
+}
+
+function renderKanjiStudy() {
+  if (!kanjiLevelSections || !kanjiSummary) return;
+
+  const groups = buildKanjiGroups();
+  const total = groups.reduce((sum, group) => sum + group.kanji.length, 0);
+  kanjiSummary.textContent = staticDbLoaded ? `표시 ${total}개 한자` : "샘플 한자만 표시 중";
+
+  kanjiLevelSections.innerHTML = groups
+    .map(
+      ({ level, kanji }) => `
+        <section class="db-level-section" aria-label="${level} 한자">
+          <div class="db-level-header">
+            <div>
+              <p class="eyebrow">${level}</p>
+              <h3>${level} 한자</h3>
+            </div>
+            <span>${kanji.length}개</span>
+          </div>
+          <div class="kanji-study-grid">
+            ${kanji
+              .map(
+                (entry) => `
+                  <article class="kanji-study-item">
+                    <div class="kanji-char">${escapeHtml(entry.kanji)}</div>
+                    <div>
+                      <h3>${escapeHtml(entry.koreanSound)} · ${escapeHtml(entry.meaning)}</h3>
+                      <p>${escapeHtml(entry.easyStory)}</p>
+                      <div class="kanji-word-links">
+                        ${entry.words
+                          .map(
+                            (word) => `
+                              <button class="secondary-button" type="button" data-kanji-word="${escapeHtml(word.id)}">
+                                ${escapeHtml(word.expression)} · ${escapeHtml(word.meaningKo)}
+                              </button>
+                            `,
+                          )
+                          .join("")}
+                      </div>
+                    </div>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+        </section>
       `,
     )
     .join("");
@@ -479,6 +780,8 @@ function switchView(viewName) {
   });
   if (viewName === "quiz") renderQuiz();
   if (viewName === "review") renderReview();
+  if (viewName === "study") renderWordStudy();
+  if (viewName === "kanji") renderKanjiStudy();
 }
 
 function extractHint(mnemonic) {
@@ -514,7 +817,9 @@ document.querySelector("#wordForm").addEventListener("submit", (event) => {
   const input = document.querySelector("#wordInput");
   const query = input.value.trim();
   if (!query) return;
-  selectCard(findCard(query) || createFallbackCard(query));
+  const found = findCard(query);
+  renderSearchResult(found || createFallbackCard(query), found ? "DB에서 찾은 검색 결과입니다." : "DB에 없어 직접 입력 카드로 만들었습니다.");
+  showToast(found ? "검색 DB에서 카드를 찾았습니다." : "DB에 없어 직접 입력 카드로 만들었습니다.");
 });
 
 document.querySelector("#saveCardBtn").addEventListener("click", saveCurrentCard);
@@ -530,6 +835,36 @@ document.querySelector("#resetDemoBtn").addEventListener("click", () => {
   selectCard(cards[0]);
   renderAll();
   showToast("샘플 단어장을 초기화했습니다.");
+});
+
+wordLevelFilter.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-level]");
+  if (!target) return;
+  wordStudyLevel = target.dataset.level;
+  wordLevelFilter.querySelectorAll("[data-level]").forEach((button) => {
+    button.classList.toggle("active", button === target);
+  });
+  renderWordStudy();
+});
+
+wordStudySearch.addEventListener("input", (event) => {
+  wordStudyQuery = event.target.value;
+  renderWordStudy();
+});
+
+kanjiLevelFilter.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-level]");
+  if (!target) return;
+  kanjiStudyLevel = target.dataset.level;
+  kanjiLevelFilter.querySelectorAll("[data-level]").forEach((button) => {
+    button.classList.toggle("active", button === target);
+  });
+  renderKanjiStudy();
+});
+
+kanjiStudySearch.addEventListener("input", (event) => {
+  kanjiStudyQuery = event.target.value;
+  renderKanjiStudy();
 });
 
 document.querySelectorAll(".nav-tab").forEach((button) => {
@@ -582,6 +917,52 @@ libraryList.addEventListener("click", (event) => {
   }
 });
 
+wordLevelSections.addEventListener("click", (event) => {
+  const openButton = event.target.closest("[data-word-open]");
+  const saveButton = event.target.closest("[data-word-save]");
+
+  if (openButton) {
+    const card = staticCards.find((item) => item.id === openButton.dataset.wordOpen);
+    if (card) {
+      selectCard(card);
+      cardPreview.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  if (saveButton) {
+    const card = staticCards.find((item) => item.id === saveButton.dataset.wordSave);
+    if (!card) return;
+    const exists = saveCardToLibrary(card);
+    showToast(exists ? "이미 저장된 카드를 갱신했습니다." : "DB 카드를 단어장에 저장했습니다.");
+  }
+});
+
+searchResult.addEventListener("click", (event) => {
+  const saveButton = event.target.closest("[data-search-save]");
+  const studyButton = event.target.closest("[data-search-study]");
+  if (!searchResultCard) return;
+
+  if (saveButton) {
+    const exists = saveCardToLibrary(searchResultCard);
+    showToast(exists ? "이미 저장된 카드를 갱신했습니다." : "검색 결과를 단어장에 저장했습니다.");
+  }
+
+  if (studyButton) {
+    selectCard(searchResultCard);
+    switchView("study");
+  }
+});
+
+kanjiLevelSections.addEventListener("click", (event) => {
+  const wordButton = event.target.closest("[data-kanji-word]");
+  if (!wordButton) return;
+  const card = staticCards.find((item) => item.id === wordButton.dataset.kanjiWord);
+  if (!card) return;
+  selectCard(card);
+  switchView("study");
+  cardPreview.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 reviewCard.addEventListener("click", () => {
   reviewBack = !reviewBack;
   renderReview();
@@ -616,3 +997,6 @@ quizCard.addEventListener("click", (event) => {
 renderSamples();
 selectCard(cards[0]);
 renderAll();
+renderWordStudy();
+renderKanjiStudy();
+loadStaticDb();

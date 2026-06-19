@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로젝트 개요서 — 소리장면 일본어</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      margin: 20px auto;
+      padding: 20mm 18mm;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+    }
+
+    /* 표지 */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 297mm;
+      text-align: center;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff;
+      margin: 0 -18mm;
+      padding: 20mm 18mm;
+    }
+
+    .cover .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #e0e0ff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 32px;
+    }
+
+    .cover h1 {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      color: #c4b5fd;
+    }
+
+    .cover .subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-bottom: 48px;
+    }
+
+    .cover .meta {
+      margin-top: 60px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .cover .meta p { margin: 4px 0; }
+
+    .cover .tags {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .cover .tag {
+      background: rgba(99,102,241,0.3);
+      border: 1px solid rgba(99,102,241,0.5);
+      color: #a5b4fc;
+      padding: 5px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    /* 본문 페이지 */
+    .content-page {
+      padding: 8mm 0;
+    }
+
+    .section {
+      margin-bottom: 36px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-num {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* 카드 그리드 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .card.accent {
+      background: linear-gradient(135deg, #f0f4ff, #ede9fe);
+      border-color: #c7d2fe;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6366f1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .card-value {
+      font-size: 14px;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    /* 사용자 타입 */
+    .user-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .user-type {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .user-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 auto 8px;
+    }
+
+    .user-label {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* 시나리오 */
+    .scenario {
+      background: #f8fafc;
+      border-left: 4px solid #6366f1;
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .scenario-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+
+    .scenario-step:last-child { margin-bottom: 0; }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      background: #6366f1;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-text {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    .step-text strong { color: #4f46e5; }
+
+    /* 기능 목록 */
+    .feature-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .feature-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .feature-text { font-size: 13px; color: #334155; }
+    .feature-text strong { display: block; color: #1e293b; font-size: 13px; margin-bottom: 2px; }
+
+    /* 스택 */
+    .stack-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stack-item {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .stack-item.highlight {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+    }
+
+    /* DB 통계 */
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, #f0f4ff, #ede9fe);
+      border: 1px solid #c7d2fe;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #4f46e5;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #6366f1;
+      font-weight: 600;
+    }
+
+    /* 화면 캡처 영역 */
+    .screen-placeholder {
+      background: linear-gradient(135deg, #1a1a2e, #0f3460);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .screen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .screen-box {
+      background: #f1f5f9;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 12px;
+      gap: 6px;
+    }
+
+    .screen-box .screen-icon { font-size: 28px; }
+
+    /* 실제 화면 이미지용 */
+    .screen-img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* AI 파이프라인 */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pipe-step {
+      flex: 1;
+      padding: 12px 10px;
+      text-align: center;
+      font-size: 11px;
+      color: #334155;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .pipe-step:last-child { border-right: none; }
+    .pipe-step .pipe-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px;
+    }
+    .pipe-step .pipe-label { font-weight: 600; color: #4f46e5; font-size: 11px; }
+
+    /* 페이지 구분선 */
+    .page-break { page-break-after: always; }
+
+    /* 기여/AI 사용 */
+    .ai-usage {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+
+    .ai-usage p { font-size: 13px; color: #166534; margin-bottom: 6px; }
+    .ai-usage p:last-child { margin-bottom: 0; }
+    .ai-usage strong { color: #14532d; }
+
+    /* 링크 */
+    a { color: #4f46e5; text-decoration: none; }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { box-shadow: none; margin: 0; width: 100%; padding: 16mm 15mm; }
+      .page.cover-page { padding: 0; }
+      .cover { min-height: 297mm; height: 297mm; margin: 0; padding: 20mm 15mm; }
+      .section { page-break-inside: avoid; }
+      .card-grid, .user-types, .feature-list, .stat-row, .screen-grid { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 표지 -->
+<div class="page cover-page">
+  <div class="cover">
+    <div class="badge">개인 프로젝트 개요서</div>
+    <h1>소리장면 일본어</h1>
+    <p class="subtitle">경선식 암기법으로 일본어 단어를 빠르게 외우는 학습 앱</p>
+
+    <div class="tags">
+      <span class="tag">Next.js 15</span>
+      <span class="tag">TypeScript</span>
+      <span class="tag">JLPT N5/N4/N3</span>
+      <span class="tag">Claude Code</span>
+      <span class="tag">2,413개 단어 DB</span>
+    </div>
+
+    <div class="meta">
+      <p>AI 코딩 에이전트 활용 개인 프로젝트</p>
+      <p style="margin-top:8px; font-size:12px;">구현 도구: Claude Code · Codex</p>
+    </div>
+  </div>
+</div>
+
+<!-- 본문 -->
+<div class="page content-page">
+
+  <!-- 1. 프로젝트 설명 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">프로젝트 간단 설명</div>
+    </div>
+
+    <div class="card accent" style="margin-bottom: 14px; padding: 18px 20px;">
+      <div class="card-label">핵심 한 문장</div>
+      <div class="card-value" style="font-size: 15px; color: #1e293b;">
+        일본어 단어의 발음과 뜻을 한국어 연상 이미지로 연결해 빠르게 외울 수 있게 돕는 <strong>경선식 스타일 단어 학습 웹앱</strong>
+      </div>
+    </div>
+
+    <p style="font-size: 13px; color: #334155; margin-bottom: 14px; line-height: 1.8;">
+      외국어 단어 암기의 가장 큰 어려움은 <strong>발음–뜻 연결고리가 없다</strong>는 점이다.
+      이 앱은 일본어 발음과 한국어 뜻을 짧은 암기 스토리로 연결하는 <strong>경선식 영단어 암기법</strong>을 일본어에 적용한다.
+      단순 반복 암기 대신, 단어마다 소리 연상·한자 이야기·예문을 함께 제공해 한 번 보면 오래 기억되도록 설계했다.
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">앱 이름</div>
+        <div class="card-value">소리장면 일본어</div>
+      </div>
+      <div class="card">
+        <div class="card-label">구현 방식</div>
+        <div class="card-value">웹 앱 (Next.js, 로컬 실행)</div>
+      </div>
+      <div class="card">
+        <div class="card-label">단어 DB 규모</div>
+        <div class="card-value">N5 326개 · N4 523개 · N3 1,564개 <br><span style="font-size:12px;color:#6366f1;">총 2,413개 (AI 암기 카드 전수 생성)</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">개발 도구</div>
+        <div class="card-value">Claude Code · Codex (AI 코딩 에이전트)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 타겟 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">타겟 (주요 사용자)</div>
+    </div>
+
+    <div class="user-types">
+      <div class="user-type">
+        <div class="user-icon" style="background:linear-gradient(135deg,#f43f5e,#e11d48);">JP</div>
+        <div class="user-label"><strong>일본어 입문자</strong><br>히라가나는 외웠지만<br>단어가 안 외워지는 학습자</div>
+      </div>
+      <div class="user-type">
+        <div class="user-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">N급</div>
+        <div class="user-label"><strong>JLPT 준비생</strong><br>N5~N3 단어를<br>빠르게 정리하고 싶은 수험생</div>
+      </div>
+      <div class="user-type">
+        <div class="user-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">漢</div>
+        <div class="user-label"><strong>한자 때문에 막힌 학습자</strong><br>뜻이 왜 그렇게 되는지<br>이해가 안 돼서 포기한 사람</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 유저 시나리오 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">유저 시나리오</div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          앱을 열면 JLPT 레벨(N5/N4/N3)을 선택하고 <strong>오늘의 단어 카드</strong>가 표시된다.
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          카드 앞면에는 일본어 단어·읽기·뜻이 보인다. 아래로 펼치면 <strong>경선식 암기문</strong> ("나무가 모리모리 모여 있는 곳이 숲")과 <strong>한자 스토리</strong>가 나온다.
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          외웠으면 <strong>"기억했어요"</strong>, 모르면 <strong>"다시 볼게요"</strong> 버튼을 누른다. 간격 반복(SRS) 알고리즘에 따라 다음 복습 날짜가 자동으로 잡힌다.
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong>검색 탭</strong>에서 모르는 단어를 검색해 즉시 암기 카드를 확인할 수 있다. DB에 없는 단어는 AI가 실시간으로 카드를 생성한다.
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">5</div>
+        <div class="step-text">
+          <strong>한자 탭</strong>에서 한자별 부수 분해 스토리를 보며 한자 암기를 보강한다. <strong>퀴즈 탭</strong>에서 4지선다 테스트로 실력을 확인한다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 주요 기능 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">주요 기능</div>
+    </div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">카드</div>
+        <div class="feature-text">
+          <strong>경선식 암기 카드</strong>
+          발음 연상 암기문 + 한자 부수 스토리 + 예문을 한 카드에
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#06b6d4,#0284c7);">SRS</div>
+        <div class="feature-text">
+          <strong>SRS 복습 스케줄</strong>
+          기억/혼동 버튼으로 간격 반복 알고리즘 자동 적용
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#10b981,#059669);">검색</div>
+        <div class="feature-text">
+          <strong>단어 검색</strong>
+          2,413개 DB 즉시 검색. DB 없는 단어는 AI 실시간 생성
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">漢字</div>
+        <div class="feature-text">
+          <strong>한자 학습 탭</strong>
+          한자별 부수 분해 + 기억 스토리 모아보기
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#f43f5e,#e11d48);">Quiz</div>
+        <div class="feature-text">
+          <strong>4지선다 퀴즈</strong>
+          학습한 카드로 즉시 테스트 가능
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">N급</div>
+        <div class="feature-text">
+          <strong>JLPT 레벨 필터</strong>
+          N5/N4/N3 레벨별 분리 학습
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 두 번째 본문 페이지 -->
+<div class="page content-page">
+
+  <!-- 5. 기술 스택 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">기술 스택</div>
+    </div>
+
+    <div class="stack-list" style="margin-bottom: 12px;">
+      <span class="stack-item highlight">Next.js 15</span>
+      <span class="stack-item highlight">TypeScript</span>
+      <span class="stack-item highlight">Claude Code</span>
+      <span class="stack-item">React 19</span>
+      <span class="stack-item">Tailwind CSS</span>
+      <span class="stack-item">LocalStorage (SRS)</span>
+      <span class="stack-item">Static JSON DB</span>
+      <span class="stack-item">Node.js 스크립트</span>
+    </div>
+
+    <div class="card" style="margin-top: 12px;">
+      <div class="card-label">AI 코딩 에이전트 활용</div>
+      <div class="card-value" style="font-size: 13px; color: #334155; margin-top: 4px;">
+        전체 코드의 90% 이상을 <strong>Claude Code</strong>와 <strong>Codex</strong>로 구현.
+        컴포넌트 설계, DB 생성 파이프라인, 스크립트 작성, 버그 수정 전 과정을 AI 에이전트와 협업.
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. AI DB 생성 파이프라인 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title">AI 암기 카드 DB 생성 파이프라인</div>
+    </div>
+
+    <div class="pipeline" style="margin-bottom: 14px;">
+      <div class="pipe-step">
+        <div class="pipe-icon">CSV</div>
+        <div class="pipe-label">CSV 단어 목록</div>
+        <div>N5/N4/N3<br>단어 수집</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">AI</div>
+        <div class="pipe-label">Claude Code 배치</div>
+        <div>4병렬로<br>카드 생성</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">DB</div>
+        <div class="pipe-label">JSONL 저장</div>
+        <div>레벨별<br>분리 저장</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">빌드</div>
+        <div class="pipe-label">DB 빌드</div>
+        <div>JSON 변환<br>중복 제거</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon">앱</div>
+        <div class="pipe-label">앱 탑재</div>
+        <div>정적 파일로<br>배포 가능</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">326</div>
+        <div class="stat-label">N5 단어</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">523</div>
+        <div class="stat-label">N4 단어</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1,564</div>
+        <div class="stat-label">N3 단어</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">2,413</div>
+        <div class="stat-label">전체 카드</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 12px;">
+      <div class="card-label">카드 1개에 포함된 정보</div>
+      <div class="card-value" style="font-size: 13px; color: #334155; margin-top: 4px;">
+        단어·읽기·로마자·뜻·품사 &nbsp;|&nbsp; 한국어 유사음(soundKo) &nbsp;|&nbsp; 경선식 암기문 &nbsp;|&nbsp;
+        쉬운 설명 &nbsp;|&nbsp; 한자별 부수 스토리 &nbsp;|&nbsp; 발음 주의사항 &nbsp;|&nbsp; 예문(일·한)
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 실행 화면 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title">실행 화면 캡처</div>
+    </div>
+
+    <div class="screen-grid">
+      <div style="border-radius:10px; overflow:hidden; border:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; padding:6px 10px; font-size:11px; color:#64748b; font-weight:600;">[ 단어 학습 카드 ]</div>
+        <img src="단어학습.png" alt="단어학습 화면" style="width:100%; display:block;">
+      </div>
+      <div style="border-radius:10px; overflow:hidden; border:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; padding:6px 10px; font-size:11px; color:#64748b; font-weight:600;">[ 단어 검색 ]</div>
+        <img src="단어검색.png" alt="단어검색 화면" style="width:100%; display:block;">
+      </div>
+      <div style="border-radius:10px; overflow:hidden; border:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; padding:6px 10px; font-size:11px; color:#64748b; font-weight:600;">[ 한자 학습 ]</div>
+        <img src="한자학습.png" alt="한자학습 화면" style="width:100%; display:block;">
+      </div>
+      <div style="border-radius:10px; overflow:hidden; border:1px solid #e2e8f0;">
+        <div style="background:#f1f5f9; padding:6px 10px; font-size:11px; color:#64748b; font-weight:600;">[ 퀴즈 ]</div>
+        <img src="퀴즈.png" alt="퀴즈 화면" style="width:100%; display:block;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. AI 코딩 에이전트 활용 내역 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title">AI 코딩 에이전트 활용 내역</div>
+    </div>
+
+    <div class="ai-usage">
+      <p>[완료] <strong>앱 전체 구조 설계:</strong> Claude Code로 Next.js 컴포넌트 구조, 상태 관리, API 라우트 설계 및 구현</p>
+      <p>[완료] <strong>단어 DB 자동 생성:</strong> Claude Code -p 모드로 2,413개 카드 경선식 암기 데이터 배치 생성 (4병렬 처리)</p>
+      <p>[완료] <strong>DB 빌드 파이프라인:</strong> Codex가 Node.js 스크립트 작성 — CSV → JSONL → JSON 변환, 중복 제거 자동화</p>
+      <p>[완료] <strong>SRS 알고리즘:</strong> 간격 반복 복습 스케줄 로직을 Claude Code와 협업으로 구현</p>
+      <p>[완료] <strong>버그 수정 및 리팩토링:</strong> 병렬 처리 시 임시 파일 충돌 문제 등 Claude Code가 자동 진단·수정</p>
+    </div>
+  </div>
+
+  <!-- 9. 결과물 링크 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div class="section-title">결과물 링크</div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card accent">
+        <div class="card-label">GitHub</div>
+        <div class="card-value" style="font-size: 13px;">
+          github.com / (본인 계정) / harnessengineering_japan
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">로컬 실행</div>
+        <div class="card-value" style="font-size: 13px;">
+          cd memory-next-app<br>npm install && npm run dev<br>→ localhost:3000
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

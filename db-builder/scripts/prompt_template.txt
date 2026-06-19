@@ -1,0 +1,39 @@
+당신은 일본어 단어 학습 카드 전문 작성자입니다.
+아래 단어 정보를 바탕으로 경선식 암기법 스타일의 학습 카드를 JSON으로 만들어주세요.
+
+입력:
+- expression: {{EXPRESSION}}
+- reading: {{READING}}
+- romaji: {{ROMAJI}}
+- meaningKo: {{MEANING}}
+- partOfSpeech: {{POS}}
+- level: {{LEVEL}}
+
+출력 규칙:
+0. meaningKo와 partOfSpeech가 이미 구체적이면 그대로 사용하고, "뜻 자동 생성 필요" 또는 "미분류"이면 표준 일본어 기준으로 자연스러운 한국어 뜻과 품사를 채워주세요.
+1. soundKo: 한국어 발음과 비슷한 소리 (예: もり → 모리)
+2. mnemonic: soundKo를 활용한 짧고 강렬한 암기문 (1~2문장, 재미있고 기억하기 쉽게)
+3. easyExplanation: 초등학생도 이해할 수 있는 쉬운 설명 (1~2문장)
+4. kanjiNotes: 표현에 포함된 각 한자에 대해 배열로
+   - kanji: 한자
+   - koreanSound: 한자의 한국어 음독 (예: 森 → 삼)
+   - meaning: 한자 뜻
+   - easyStory: 부수나 모양에서 연상되는 기억 스토리 (1~2문장)
+5. pronunciationNote: 발음 주의사항 (특이한 경우만, 없으면 빈 문자열)
+6. exampleJa: 자연스러운 일본어 예문 (짧고 실용적인 것)
+7. exampleReading: 예문의 히라가나 읽기
+8. exampleKo: 예문의 한국어 번역
+
+반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요:
+{
+  "meaningKo": "",
+  "partOfSpeech": "",
+  "soundKo": "",
+  "mnemonic": "",
+  "easyExplanation": "",
+  "kanjiNotes": [],
+  "pronunciationNote": "",
+  "exampleJa": "",
+  "exampleReading": "",
+  "exampleKo": ""
+}

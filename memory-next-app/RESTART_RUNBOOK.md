@@ -74,7 +74,8 @@ grep -E '^(AI_PROVIDER|OPENAI_OAUTH_BASE_URL|OPENAI_MODEL)=' .env.local
 별도 터미널 1개를 열고:
 
 ```bash
-PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH npx openai-oauth
+PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH \
+  npx openai-oauth --codex-version 0.140.0 --models gpt-5.4
 ```
 
 정상이라면 로컬 프록시가 아래 주소로 열린다.
@@ -99,10 +100,20 @@ PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH npx @openai/codex login
 로그인 후 다시:
 
 ```bash
-PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH npx openai-oauth
+PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH \
+  npx openai-oauth --codex-version 0.140.0 --models gpt-5.4
 ```
 
 주의: 이 터미널은 계속 켜둔다.
+
+### `Could not determine the Codex API version` 또는 시작 직후 `fetch failed`
+
+Codex 버전 자동 감지 또는 모델 목록 조회가 실패한 것이다. 버전과 모델을 명시해서 실행한다.
+
+```bash
+PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH \
+  npx openai-oauth --codex-version 0.140.0 --models gpt-5.4
+```
 
 ## 6. Next.js 앱 실행
 
@@ -158,7 +169,8 @@ PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH node -v
 그 다음 다시:
 
 ```bash
-PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH npx openai-oauth
+PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH \
+  npx openai-oauth --codex-version 0.140.0 --models gpt-5.4
 ```
 
 ### `EADDRINUSE: address already in use :::4320`
@@ -271,7 +283,8 @@ OPENAI_MODEL=gpt-5.4
 
 ```bash
 cd "/home/seong/2026/harnessengineering_japan/memory-next-app"
-PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH npx openai-oauth
+PATH=/home/seong/.nvm/versions/node/v20.20.2/bin:$PATH \
+  npx openai-oauth --codex-version 0.140.0 --models gpt-5.4
 ```
 
 터미널 2:
